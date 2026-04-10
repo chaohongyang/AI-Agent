@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Argus — Social Media Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05070f;
+  --bg2:#0a0e1d;
+  --bg3:#111627;
+  --card:rgba(17,22,39,0.6);
+  --border:rgba(148,163,184,0.1);
+  --border-hi:rgba(0,212,255,0.3);
+  --text:#f1f5f9;
+  --muted:#64748b;
+  --muted2:#94a3b8;
+  --cyan:#00d4ff;
+  --violet:#a855f7;
+  --pink:#ec4899;
+  --green:#10b981;
+  --red:#ef4444;
+  --amber:#f59e0b;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,212,255,0.08), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168,85,247,0.06), transparent);
+  pointer-events:none;z-index:0;
+}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+
+/* ---------- NAV ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  backdrop-filter:blur(16px);
+  background:rgba(5,7,15,0.72);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:1200px;margin:0 auto;padding:1rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.25rem;letter-spacing:-.5px}
+.logo-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(0,212,255,.35);
+}
+.logo-mark svg{color:#000}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{color:var(--muted2);font-size:.92rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-actions{display:flex;gap:.75rem;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.6rem 1.15rem;border-radius:9px;font-weight:600;font-size:.9rem;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-ghost{color:var(--muted2)}
+.btn-ghost:hover{color:var(--text)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),#0ea5e9);
+  color:#000;font-weight:700;
+  box-shadow:0 4px 20px rgba(0,212,255,.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,212,255,.45)}
+.btn-outline{border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--border-hi);background:rgba(0,212,255,.05)}
+.btn-lg{padding:.85rem 1.75rem;font-size:.98rem}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:9rem 1.5rem 4rem;overflow:hidden;
+}
+#hero-canvas{
+  position:absolute;inset:0;z-index:0;opacity:.55;
+}
+.hero > *{position:relative;z-index:1}
+.badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.4rem 1rem;margin-bottom:1.75rem;
+  background:rgba(0,212,255,.08);
+  border:1px solid rgba(0,212,255,.25);
+  border-radius:100px;
+  font-size:.78rem;font-weight:600;letter-spacing:.5px;
+  color:var(--cyan);text-transform:uppercase;
+}
+.badge .dot{
+  width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{
+  font-size:clamp(2.75rem,6vw,5rem);
+  font-weight:900;letter-spacing:-2.5px;line-height:1.05;
+  max-width:900px;margin-bottom:1.5rem;
+}
+.gradient-text{
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--violet) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero p.lead{
+  font-size:1.2rem;color:var(--muted2);max-width:620px;
+  margin-bottom:2.5rem;line-height:1.6;
+}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.hero-meta{
+  margin-top:2.25rem;display:flex;align-items:center;gap:1.5rem;
+  color:var(--muted);font-size:.85rem;flex-wrap:wrap;justify-content:center;
+}
+.hero-meta .check{color:var(--green);font-weight:700;margin-right:.3rem}
+
+/* ---------- DASHBOARD PREVIEW ---------- */
+.preview-wrap{
+  margin-top:5rem;max-width:1100px;margin-left:auto;margin-right:auto;
+  position:relative;perspective:1800px;
+}
+.preview-wrap::before{
+  content:'';position:absolute;inset:-60px;
+  background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(0,212,255,.25),transparent 70%);
+  z-index:0;filter:blur(40px);
+}
+.dashboard{
+  position:relative;background:var(--bg2);
+  border:1px solid var(--border);border-radius:16px;
+  box-shadow:0 40px 80px -20px rgba(0,0,0,.6),0 0 0 1px rgba(0,212,255,.12);
+  overflow:hidden;z-index:1;
+  transform:rotateX(3deg);
+}
+.dash-topbar{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.85rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  background:var(--bg3);
+}
+.dash-dot{width:12px;height:12px;border-radius:50%}
+.dash-dot.r{background:#ff5f56}.dash-dot.y{background:#ffbd2e}.dash-dot.g{background:#27c93f}
+.dash-url{
+  flex:1;margin-left:1rem;padding:.3rem .75rem;
+  background:var(--bg);border-radius:6px;
+  font-size:.75rem;color:var(--muted);font-family:'SF Mono',monospace;
+}
+.dash-body{
+  display:grid;grid-template-columns:220px 1fr;min-height:520px;
+}
+.dash-sidebar{
+  padding:1.5rem 1rem;border-right:1px solid var(--border);
+  background:rgba(10,14,29,.5);
+}
+.side-brand{display:flex;align-items:center;gap:.5rem;margin-bottom:2rem;padding:0 .5rem}
+.side-brand-mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.side-brand span{font-weight:800;font-size:.95rem}
+.side-label{
+  font-size:.68rem;text-transform:uppercase;color:var(--muted);
+  padding:0 .5rem;margin:1.25rem 0 .5rem;letter-spacing:1px;
+}
+.side-item{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.55rem .5rem;border-radius:7px;
+  font-size:.82rem;color:var(--muted2);cursor:pointer;
+}
+.side-item.active{background:rgba(0,212,255,.08);color:var(--cyan)}
+.side-item .ico{width:14px;height:14px;display:inline-block;opacity:.8}
+.dash-main{padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;overflow:hidden}
+.dash-head{display:flex;justify-content:space-between;align-items:center}
+.dash-head h3{font-size:1.1rem;font-weight:700}
+.dash-head .pill{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.25rem .7rem;background:rgba(16,185,129,.1);
+  border:1px solid rgba(16,185,129,.3);border-radius:100px;
+  font-size:.72rem;color:var(--green);font-weight:600;
+}
+.dash-head .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:.85rem;
+}
+.stat-card .label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat-card .val{font-size:1.4rem;font-weight:800;margin-top:.15rem}
+.stat-card .delta{font-size:.7rem;margin-top:.2rem;font-weight:600}
+.stat-card .delta.up{color:var(--green)}
+.stat-card .delta.down{color:var(--red)}
+.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:1rem;flex:1;min-height:0}
+.chart-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:1rem;display:flex;flex-direction:column;
+}
+.chart-title{font-size:.78rem;color:var(--muted2);font-weight:600;margin-bottom:.75rem}
+.bars{display:flex;gap:6px;align-items:flex-end;height:120px;padding:.5rem 0}
+.bar{flex:1;background:linear-gradient(to top,rgba(0,212,255,.2),var(--cyan));border-radius:3px 3px 0 0;animation:grow 1s ease-out}
+@keyframes grow{from{height:0}}
+.legend{display:flex;gap:1rem;font-size:.7rem;color:var(--muted);margin-top:.5rem}
+.legend span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:.35rem;vertical-align:1px;background:var(--cyan)}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}
+.donut{position:relative;width:130px;height:130px}
+.donut svg{transform:rotate(-90deg)}
+.donut-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.donut-center .num{font-size:1.5rem;font-weight:800}
+.donut-center .lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.donut-legend{display:flex;gap:.85rem;margin-top:.5rem;font-size:.7rem}
+.donut-legend span{display:flex;align-items:center;gap:.35rem;color:var(--muted2)}
+.donut-legend .sw{width:7px;height:7px;border-radius:50%}
+.feed{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.feed-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.feed-title{font-size:.78rem;color:var(--muted2);font-weight:600}
+.feed-list{display:flex;flex-direction:column;gap:.65rem;max-height:120px;overflow:hidden;position:relative}
+.feed-item{
+  display:flex;align-items:flex-start;gap:.6rem;
+  padding:.55rem .7rem;border-radius:8px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  font-size:.78rem;animation:slideIn .4s ease-out;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.feed-plat{
+  width:22px;height:22px;border-radius:5px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:800;color:#000;
+}
+.feed-plat.tw{background:#1da1f2}
+.feed-plat.ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}
+.feed-plat.tt{background:#000;color:#fff;border:1px solid #334}
+.feed-plat.rd{background:#ff4500}
+.feed-plat.yt{background:#ff0000;color:#fff}
+.feed-text{flex:1;color:var(--muted2);line-height:1.4}
+.feed-sent{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.sent-pos{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sent-neu{background:var(--amber)}
+.sent-neg{background:var(--red);box-shadow:0 0 6px var(--red)}
+
+/* ---------- LOGO BAR ---------- */
+.trust-bar{
+  padding:4rem 0 2rem;text-align:center;
+  border-top:1px solid var(--border);margin-top:6rem;
+}
+.trust-bar p{
+  font-size:.75rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:2px;margin-bottom:1.75rem;
+}
+.trust-logos{
+  display:flex;justify-content:center;align-items:center;
+  gap:3.5rem;flex-wrap:wrap;opacity:.5;
+}
+.trust-logos span{font-weight:700;font-size:1.1rem;letter-spacing:-.3px}
+
+/* ---------- SECTIONS ---------- */
+section{padding:7rem 0;position:relative;z-index:1}
+.section-head{text-align:center;max-width:680px;margin:0 auto 4rem}
+.eyebrow{
+  display:inline-block;padding:.35rem .9rem;margin-bottom:1rem;
+  background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);
+  border-radius:100px;font-size:.72rem;font-weight:700;
+  color:var(--violet);text-transform:uppercase;letter-spacing:1px;
+}
+h2{
+  font-size:clamp(2rem,4.5vw,3.25rem);
+  font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:1rem;
+}
+.section-head p{color:var(--muted2);font-size:1.1rem}
+
+/* ---------- FEATURES ---------- */
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:1.25rem;
+}
+.feature{
+  background:var(--card);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:14px;padding:1.75rem;
+  transition:transform .2s,border-color .2s;
+  position:relative;overflow:hidden;
+}
+.feature::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at top left,rgba(0,212,255,.06),transparent 50%);
+  opacity:0;transition:opacity .3s;
+}
+.feature:hover{transform:translateY(-4px);border-color:var(--border-hi)}
+.feature:hover::before{opacity:1}
+.feature-ico{
+  width:44px;height:44px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.15));
+  border:1px solid rgba(0,212,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.25rem;color:var(--cyan);
+}
+.feature h3{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+.feature p{color:var(--muted2);font-size:.92rem;line-height:1.6}
+
+/* ---------- HOW IT WORKS ---------- */
+.steps{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:2rem;position:relative;
+}
+.step{text-align:center;position:relative}
+.step-num{
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:1.3rem;color:#000;
+  margin:0 auto 1.25rem;
+  box-shadow:0 0 30px rgba(0,212,255,.3);
+}
+.step h3{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+.step p{color:var(--muted2);font-size:.92rem}
+
+/* ---------- PRICING ---------- */
+.price-toggle{
+  display:inline-flex;gap:.25rem;padding:.3rem;
+  background:var(--bg3);border:1px solid var(--border);border-radius:100px;
+  margin:1.5rem auto 0;
+}
+.price-toggle button{
+  padding:.5rem 1.25rem;border-radius:100px;
+  font-size:.85rem;font-weight:600;color:var(--muted2);transition:all .2s;
+}
+.price-toggle button.active{background:var(--cyan);color:#000}
+.save-pill{
+  font-size:.65rem;background:rgba(16,185,129,.15);color:var(--green);
+  padding:.1rem .4rem;border-radius:4px;margin-left:.35rem;
+}
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;max-width:1100px;margin:0 auto;
+}
+.plan{
+  background:var(--card);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:16px;padding:2rem;
+  display:flex;flex-direction:column;position:relative;
+}
+.plan.popular{
+  border-color:var(--cyan);
+  background:linear-gradient(180deg,rgba(0,212,255,.06),var(--card));
+  box-shadow:0 0 60px rgba(0,212,255,.1);
+}
+.plan-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  color:#000;font-size:.7rem;font-weight:800;padding:.3rem .85rem;
+  border-radius:100px;text-transform:uppercase;letter-spacing:.5px;
+  white-space:nowrap;
+}
+.plan-name{font-size:.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem}
+.plan-price{display:flex;align-items:baseline;gap:.35rem}
+.plan-price .n{font-size:3rem;font-weight:900;letter-spacing:-2px}
+.plan-price .p{color:var(--muted)}
+.plan-desc{color:var(--muted2);font-size:.88rem;margin:.75rem 0 1.5rem;line-height:1.5}
+.plan ul{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem;flex:1}
+.plan li{font-size:.88rem;display:flex;gap:.6rem;align-items:flex-start;color:var(--muted2)}
+.plan li svg{color:var(--cyan);flex-shrink:0;margin-top:2px}
+.plan li.off{opacity:.45}
+.plan li.off svg{color:var(--muted)}
+.plan .btn{width:100%;justify-content:center}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:780px;margin:0 auto}
+.faq-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:.75rem;overflow:hidden;
+}
+.faq-q{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.1rem 1.5rem;width:100%;text-align:left;
+  font-size:.98rem;font-weight:600;
+}
+.faq-q:hover{background:rgba(255,255,255,.02)}
+.faq-q .caret{transition:transform .3s;flex-shrink:0;margin-left:1rem}
+.faq-item.open .caret{transform:rotate(180deg)}
+.faq-a{
+  max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;
+  padding:0 1.5rem;color:var(--muted2);font-size:.92rem;line-height:1.6;
+}
+.faq-item.open .faq-a{max-height:260px;padding:0 1.5rem 1.25rem}
+
+/* ---------- CTA ---------- */
+.cta-box{
+  max-width:900px;margin:0 auto;text-align:center;
+  background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(168,85,247,.08));
+  border:1px solid var(--border-hi);border-radius:24px;
+  padding:4rem 2rem;position:relative;overflow:hidden;
+}
+.cta-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(0,212,255,.12),transparent 70%);
+}
+.cta-box>*{position:relative;z-index:1}
+.cta-box h2{margin-bottom:.75rem}
+.cta-box p{color:var(--muted2);margin-bottom:2rem;font-size:1.05rem}
+.cta-form{
+  display:flex;gap:.75rem;max-width:500px;margin:0 auto;flex-wrap:wrap;
+}
+.cta-form input{
+  flex:1;min-width:220px;padding:.9rem 1.2rem;
+  background:rgba(5,7,15,.6);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:.95rem;font-family:inherit;
+  outline:none;transition:border-color .2s;
+}
+.cta-form input:focus{border-color:var(--cyan)}
+.cta-form input::placeholder{color:var(--muted)}
+.cta-form button{
+  padding:.9rem 1.75rem;border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),#0ea5e9);
+  color:#000;font-weight:700;font-size:.95rem;
+  box-shadow:0 4px 20px rgba(0,212,255,.35);white-space:nowrap;
+}
+.cta-note{font-size:.78rem;color:var(--muted);margin-top:1rem}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--border);padding:4rem 0 2rem;margin-top:4rem}
+.foot-grid{
+  display:grid;grid-template-columns:2fr repeat(3,1fr);gap:3rem;margin-bottom:3rem;
+}
+.foot-brand p{color:var(--muted2);font-size:.9rem;margin-top:.75rem;max-width:280px}
+.foot-col h4{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:1rem}
+.foot-col li{margin-bottom:.55rem}
+.foot-col a{color:var(--muted2);font-size:.88rem;transition:color .2s}
+.foot-col a:hover{color:var(--text)}
+.foot-bot{
+  padding-top:1.75rem;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  color:var(--muted);font-size:.82rem;
+}
+
+/* ---------- REVEAL ANIMATION ---------- */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:860px){
+  .nav-links{display:none}
+  .dash-body{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .chart-row{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:2rem}
+  .foot-brand{grid-column:1/-1}
+}
+@media (max-width:500px){
+  .stat-row{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/></svg>
+      </span>
+      Argus
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn btn-ghost">Sign in</a>
+      <a href="#cta" class="btn btn-primary">Start free trial</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="badge"><span class="dot"></span>Argus 3.0 — now with AI crisis detection</div>
+  <h1>See everything.<br><span class="gradient-text">Miss nothing.</span></h1>
+  <p class="lead">Argus is the social media intelligence platform trusted by modern brands to monitor mentions, decode sentiment, and spot crises — before they trend.</p>
+  <div class="hero-actions">
+    <a href="#cta" class="btn btn-primary btn-lg">Start free 14-day trial</a>
+    <a href="#how" class="btn btn-outline btn-lg">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Watch demo
+    </a>
+  </div>
+  <div class="hero-meta">
+    <span><span class="check">✓</span>No credit card</span>
+    <span><span class="check">✓</span>Setup in 60 seconds</span>
+    <span><span class="check">✓</span>Cancel anytime</span>
+  </div>
+
+  <!-- DASHBOARD PREVIEW -->
+  <div class="preview-wrap">
+    <div class="dashboard">
+      <div class="dash-topbar">
+        <span class="dash-dot r"></span><span class="dash-dot y"></span><span class="dash-dot g"></span>
+        <span class="dash-url">app.argus.io/dashboard</span>
+      </div>
+      <div class="dash-body">
+        <aside class="dash-sidebar">
+          <div class="side-brand"><div class="side-brand-mark"></div><span>Argus</span></div>
+          <div class="side-label">Workspace</div>
+          <div class="side-item active">◉ Overview</div>
+          <div class="side-item">◎ Mentions</div>
+          <div class="side-item">◎ Sentiment</div>
+          <div class="side-item">◎ Competitors</div>
+          <div class="side-item">◎ Influencers</div>
+          <div class="side-label">Tools</div>
+          <div class="side-item">◎ Alerts</div>
+          <div class="side-item">◎ Reports</div>
+          <div class="side-item">◎ Settings</div>
+        </aside>
+        <div class="dash-main">
+          <div class="dash-head">
+            <h3>Brand Overview — Last 7 days</h3>
+            <span class="pill"><span class="dot"></span>Live</span>
+          </div>
+          <div class="stat-row">
+            <div class="stat-card"><div class="label">Mentions</div><div class="val">24,891</div><div class="delta up">▲ 18.2%</div></div>
+            <div class="stat-card"><div class="label">Reach</div><div class="val">8.4M</div><div class="delta up">▲ 12.7%</div></div>
+            <div class="stat-card"><div class="label">Sentiment</div><div class="val">72%</div><div class="delta up">▲ 4.1%</div></div>
+            <div class="stat-card"><div class="label">Crisis Risk</div><div class="val">Low</div><div class="delta down">▼ Stable</div></div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Mention volume</div>
+              <div class="bars" id="bars"></div>
+              <div class="legend"><span>Mentions per day</span></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Sentiment</div>
+              <div class="donut-wrap">
+                <div class="donut">
+                  <svg width="130" height="130" viewBox="0 0 130 130">
+                    <circle cx="65" cy="65" r="52" fill="none" stroke="#1e293b" stroke-width="14"/>
+                    <circle cx="65" cy="65" r="52" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="235 327" stroke-linecap="butt"/>
+                    <circle cx="65" cy="65" r="52" fill="none" stroke="#f59e0b" stroke-width="14" stroke-dasharray="62 327" stroke-dashoffset="-235"/>
+                    <circle cx="65" cy="65" r="52" fill="none" stroke="#ef4444" stroke-width="14" stroke-dasharray="30 327" stroke-dashoffset="-297"/>
+                  </svg>
+                  <div class="donut-center"><div class="num">72%</div><div class="lbl">Positive</div></div>
+                </div>
+                <div class="donut-legend">
+                  <span><span class="sw" style="background:#10b981"></span>Pos</span>
+                  <span><span class="sw" style="background:#f59e0b"></span>Neu</span>
+                  <span><span class="sw" style="background:#ef4444"></span>Neg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feed">
+            <div class="feed-head">
+              <div class="feed-title">Live mentions</div>
+              <span class="pill"><span class="dot"></span>Streaming</span>
+            </div>
+            <div class="feed-list" id="feed"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust-bar">
+    <p>Trusted by 12,000+ teams worldwide</p>
+    <div class="trust-logos">
+      <span>MERIDIAN</span>
+      <span>VANTA LABS</span>
+      <span>HYPERION</span>
+      <span>STRATOS</span>
+      <span>NEXON</span>
+      <span>ORION</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Features</span>
+      <h2>Intelligence at the speed of culture</h2>
+      <p>Everything you need to understand, track, and respond to conversations about your brand — across every platform that matters.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a10 10 0 0 1 20 0"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div>
+        <h3>Real-time monitoring</h3>
+        <p>Track mentions, hashtags, and keywords across 50+ platforms the moment they're posted. Sub-second latency, zero gaps.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div>
+        <h3>Sentiment AI</h3>
+        <p>Proprietary NLP classifies every mention with emotion-level accuracy — sarcasm, irony, and mixed sentiment included.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div>
+        <h3>Competitor tracking</h3>
+        <p>Benchmark share of voice, engagement, and audience growth against your rivals. See their playbook in real time.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h3>Trend detection</h3>
+        <p>Spot rising topics hours before they peak. Our AI surfaces viral content while it's still taking shape.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div>
+        <h3>Influencer discovery</h3>
+        <p>Find creators shaping your niche. Filter by reach, engagement quality, and audience authenticity scores.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        <h3>Crisis alerts</h3>
+        <p>Get paged the moment negative signals spike. Triage, context, and suggested responses — all in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:linear-gradient(180deg,transparent,rgba(10,14,29,.5),transparent)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>From signal to insight in minutes</h2>
+      <p>No data team required. Argus does the heavy lifting so you can focus on what the data means.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3>Define your topics</h3>
+        <p>Enter brand names, keywords, or competitor handles. Argus starts listening across every major platform instantly.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h3>We watch 24/7</h3>
+        <p>Our infrastructure processes hundreds of millions of posts daily, applying NLP to every single piece of content.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h3>Get live insights</h3>
+        <p>Dashboards, alerts, and reports update in real time. Filter, drill down, and share — all in a few clicks.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <h3>Act & integrate</h3>
+        <p>Push data to Slack, Teams, or your CRM via webhooks. Automate workflows with our open REST API.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Pricing</span>
+      <h2>Simple, transparent pricing</h2>
+      <p>Start free. Upgrade when you need more. Cancel anytime.</p>
+      <div class="price-toggle">
+        <button class="active" data-period="monthly">Monthly</button>
+        <button data-period="yearly">Yearly<span class="save-pill">-20%</span></button>
+      </div>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan reveal">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><span class="n" data-monthly="$49" data-yearly="$39">$49</span><span class="p">/mo</span></div>
+        <p class="plan-desc">For freelancers and small brands finding their footing.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>3 tracked topics</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>10 platforms</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>7-day data history</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Email alerts</li>
+          <li class="off"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>Competitor tracking</li>
+          <li class="off"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>API access</li>
+        </ul>
+        <a href="#cta" class="btn btn-outline">Get started</a>
+      </div>
+      <div class="plan popular reveal">
+        <div class="plan-badge">★ Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><span class="n" data-monthly="$149" data-yearly="$119">$149</span><span class="p">/mo</span></div>
+        <p class="plan-desc">For growing teams serious about their brand intelligence.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>20 tracked topics</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>All 50+ platforms</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>1-year history</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Slack + webhook alerts</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>5 competitors tracked</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Full API access</li>
+        </ul>
+        <a href="#cta" class="btn btn-primary">Start free trial</a>
+      </div>
+      <div class="plan reveal">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price"><span class="n">Custom</span></div>
+        <p class="plan-desc">For organizations with complex, mission-critical needs.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Unlimited topics</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Custom crawlers</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Unlimited history</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Dedicated CSM</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>SSO + audit logs</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>SLA + custom contracts</li>
+        </ul>
+        <a href="#cta" class="btn btn-outline">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions, answered</h2>
+      <p>Everything you need to know about Argus before you get started.</p>
+    </div>
+    <div class="faq">
+      <div class="faq-item reveal">
+        <button class="faq-q">Which platforms does Argus monitor?<svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="faq-a">Argus tracks 50+ platforms including X (Twitter), Instagram, TikTok, YouTube, Reddit, LinkedIn, Facebook, news sites, blogs, forums, review sites, and public Discord servers. Custom sources can be added on Enterprise plans.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How fast are alerts delivered?<svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="faq-a">Median alert delivery is 99ms from when a post appears on the source platform. Crisis-level events trigger instant push notifications via our mobile app, Slack, or webhook.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Is there a free trial?<svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="faq-a">Yes — every plan comes with a 14-day free trial, no credit card required. You'll get full access to all Pro features during the trial period.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Can I integrate Argus with my existing tools?<svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="faq-a">Absolutely. Native integrations include Slack, Microsoft Teams, Salesforce, HubSpot, Zapier, and Discord. Our REST API and webhooks let you connect virtually anywhere.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How accurate is the sentiment analysis?<svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="faq-a">Our proprietary sentiment model scores 94.2% accuracy on benchmark datasets, trained on billions of social posts across 40+ languages. It correctly handles sarcasm, irony, and mixed sentiment — the hard cases.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-box reveal">
+      <h2>Ready to see the conversation?</h2>
+      <p>Join 12,000+ teams using Argus to protect their brand and out-listen the competition.</p>
+      <form class="cta-form" onsubmit="event.preventDefault();this.querySelector('button').textContent='✓ Check your inbox'">
+        <input type="email" placeholder="Enter your work email" required>
+        <button type="submit">Get early access</button>
+      </form>
+      <p class="cta-note">Free 14-day trial • No credit card required • Cancel anytime</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo">
+          <span class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/></svg></span>
+          Argus
+        </a>
+        <p>Social media intelligence for brands that can't afford to be surprised.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">API Docs</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">DPA</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 Argus Technologies, Inc. All rights reserved.</span>
+      <span>Made with intelligence.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── HERO CANVAS: particle network ──
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+  const N = 70;
+
+  function resize(){
+    w = canvas.width = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+  function init(){
+    particles = [];
+    for(let i=0;i<N;i++){
+      particles.push({
+        x: Math.random()*w, y: Math.random()*h,
+        vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+        r: Math.random()*1.6+.6
+      });
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>w)p.vx*=-1;
+      if(p.y<0||p.y>h)p.vy*=-1;
+      ctx.fillStyle='rgba(0,212,255,.7)';
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    }
+    for(let i=0;i<N;i++){
+      for(let j=i+1;j<N;j++){
+        const a=particles[i],b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<130){
+          ctx.strokeStyle=`rgba(0,212,255,${.15*(1-d/130)})`;
+          ctx.lineWidth=.6;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  resize();init();tick();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+
+// ── BAR CHART ──
+(function(){
+  const bars = document.getElementById('bars');
+  const heights = [45,62,38,78,92,71,85];
+  bars.innerHTML = heights.map(h=>`<div class="bar" style="height:${h}%"></div>`).join('');
+})();
+
+// ── LIVE MENTION FEED ──
+(function(){
+  const feed = document.getElementById('feed');
+  const items = [
+    {p:'tw',plat:'𝕏',text:'Just switched to @argus and the real-time alerts are insane. Caught a trend 3 hours before competitors.',sent:'pos'},
+    {p:'rd',plat:'R',text:'r/marketing — Best social listening tool in 2026? Argus keeps coming up in every thread...',sent:'neu'},
+    {p:'ig',plat:'Ig',text:'Love how Argus visualizes sentiment across campaigns. Game changer for our agency. #MarketingStack',sent:'pos'},
+    {p:'tt',plat:'t',text:'POV: your social listening tool actually catches the crisis before it goes viral 🔥',sent:'pos'},
+    {p:'yt',plat:'▶',text:'Review: Argus vs. Brandwatch vs. Sprinklr — which one wins in 2026?',sent:'neu'},
+    {p:'tw',plat:'𝕏',text:'Our brand sentiment dashboard on @argus updates in real time. Never going back to weekly reports.',sent:'pos'},
+    {p:'rd',plat:'R',text:'Anyone else notice Argus flagged the outage 12 minutes before it hit status pages? Wild.',sent:'pos'},
+  ];
+  let idx = 0;
+  function render(){
+    const shown = [items[idx%items.length], items[(idx+1)%items.length], items[(idx+2)%items.length]];
+    feed.innerHTML = shown.map(i=>`
+      <div class="feed-item">
+        <div class="feed-plat ${i.p}">${i.plat}</div>
+        <div class="feed-text">${i.text}</div>
+        <div class="feed-sent sent-${i.sent}"></div>
+      </div>
+    `).join('');
+  }
+  render();
+  setInterval(()=>{idx++;render();},3200);
+})();
+
+// ── PRICING TOGGLE ──
+(function(){
+  const buttons = document.querySelectorAll('.price-toggle button');
+  const prices = document.querySelectorAll('.plan-price .n[data-monthly]');
+  buttons.forEach(b=>b.addEventListener('click',()=>{
+    buttons.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const period = b.dataset.period;
+    prices.forEach(p=>{p.textContent = p.dataset[period]});
+  }));
+})();
+
+// ── FAQ ACCORDION ──
+(function(){
+  document.querySelectorAll('.faq-q').forEach(q=>{
+    q.addEventListener('click',()=>{
+      const item = q.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen) item.classList.add('open');
+    });
+  });
+})();
+
+// ── SCROLL REVEAL ──
+(function(){
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}
+    });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>
